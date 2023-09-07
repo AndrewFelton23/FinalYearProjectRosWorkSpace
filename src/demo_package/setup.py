@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             'my_node = demo_package.my_node:main',
             'streamer_node = demo_package.streamer_node:main',
-            'flask_node = demo_package.flask_node:main'
+            'flask_node = demo_package.flask_node:main',
+            'hmi_node = demo_package.hmi_node:main'
         ],
     },
 )

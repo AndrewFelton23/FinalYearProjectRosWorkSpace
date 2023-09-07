@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collaborative Robot Controller</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="background-container">
+        <div class="heading-container">
+            <h1>Collaborative Robot Controller</h1>
+            <p>A HMI that uses javascript, html, css and flask to interact with a collaborative robot.</p>
+        </div>
+        <div class="main-container">
+            <div class="left-container">
+                <!-- Left container content goes here -->
+                <div class="on-off">
+                    <h2>On-Off Control</h2>
+                    <div class="start-panel">
+                        <div id="start-led" class="start-led"></div>
+                        <button id="startBtn" class="start-button">Start</button>
+                    </div>
+                    <div class="stop-panel">
+                        <div id="stop-led" class="stop-led"></div>
+                        <button id="stopBtn" class="start-button">Stop</button>
+                    </div>
+                </div>
+                <div class="position-status">
+                    <h2>Robot status</h2>
+                    <div class="position-coordinate">
+                        <h3>Joint 1: </h3>
+                        <div id="joint1-response"></div>
+                    </div>
+                    <div class="position-coordinate">
+                        <h3>Joint 2: </h3>
+                        <div id="joint2-response"></div>
+                    </div>
+                    <div class="position-coordinate">
+                        <h3>Joint 3: </h3>
+                        <div id="joint3-response"></div>
+                    </div>
+                    <div class="position-coordinate">
+                        <h3>Joint 4: </h3>
+                        <div id="joint4-response"></div>
+                    </div>
+                    <div class="position-coordinate">
+                        <h3>Gripper: </h3>
+                        <div id="gripper-response"></div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="middle-container">
+                <!-- Middle container content goes here -->
+                <div class="video-container">
+                    <img id="video-feed" src="{{ url_for('get_image') }}" alt="Camera Image">
+                </div>
+                <div class="cycles-status">
+                    <div class="cycles">
+                        <h4>Number of Uninterrupted Cycles</h4>
+                        <div id="cycles-response"></div>
+                    </div>
+                    <div class="status">
+                        <h4>Robot Status</h4>
+                        <div id="status-response"></div>
+                    </div>
+                </div>
+                <div class="auto-control">
+                    <div class="auto-controller">
+                        <h2>Automatic Control Mode</h2>
+                        <div class="on-panel">
+                            <div id="auto-on-led" class="on-led"></div>
+                            <button id="auto-onBtn" class="on-button">On</button>
+                        </div>
+                        <div class="off-panel">
+                            <div id="auto-off-led" class="off-led"></div>
+                            <button id="auto-offBtn" class="off-button">Off</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-container">
+                <!-- Right container content goes here -->
+                <div class="manual-control">
+                    <div class="manual-controller">
+                        <h2>Manual Control Mode</h2>
+                        <div class="on-panel">
+                            <div id="manual-on-led" class="on-led"></div>
+                            <button id="manual-onBtn" class="on-button">On</button>
+                        </div>
+                        <div class="off-panel">
+                            <div id="manual-off-led" class="off-led"></div>
+                            <button id="manual-offBtn" class="off-button">Off</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Robot Control</h3>
+                        <div class="robot-control">
+                            <button class="robot-button">Return To Home</button>
+                            <button class="robot-button">Inspect Next Part</button>  
+                        </div>
+                        <h3>Gripper Control</h3>
+                        <div class="robot-control">
+                            <button class="robot-button">Open Gripper</button> 
+                            <button class="robot-button">Close Gripper</button>                 
+                        </div>
+                        <h3>Conveyor Control</h3>
+                        <div class="robot-control">
+                            <button class="robot-button">Start Conveyor</button> 
+                            <button class="robot-button">Stop Conveyor</button>                 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>2023 Final Year Project by Andrew Felton.</p>
+            <p>Student Number: s219064164</p>
+            <p>Contact Email: s219064164@mandela.ac.za</p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='videoscript.js') }}"></script>
+    <script src="{{ url_for('static', filename='positionscript.js') }}"></script>
+    <script src="{{ url_for('static', filename='autoscript.js') }}"></script>
+    <script src="{{ url_for('static', filename='manualscript.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
