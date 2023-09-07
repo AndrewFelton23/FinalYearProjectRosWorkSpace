@@ -1,0 +1,23 @@
+# ROS build and development artifacts
+build/
+devel/
+install/
+log/
+
+# Ignore ROS workspace configuration files
+.catkin_workspace
+.project
+.cproject
+
+# Python bytecode files
+__pycache__/
+
+# Compiled Python files
+*.pyc
+*.pyo
+
+# IDE-specific files (e.g., for Visual Studio Code)
+.vscode/
+
+# Dependency directories (e.g., virtual environments)
+venv/

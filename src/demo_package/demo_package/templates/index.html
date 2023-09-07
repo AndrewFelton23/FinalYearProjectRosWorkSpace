@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Stream</title>
+</head>
+<body>
+    <h1>Camera Stream</h1>
+    <img id="video_feed" src="{{ url_for('get_image') }}" alt="Camera Image">
+
+
+    <script>
+        // Function to update the image every few seconds
+        function updateImage() {
+            var img = document.getElementById('video_feed');
+            img.src = "{{ url_for('get_image') }}?" + new Date().getTime(); // Add a timestamp to prevent caching
+            setTimeout(updateImage, 300); // Update every 3 seconds (adjust as needed)
+        }
+
+        // Call the updateImage function to start updating the image
+        updateImage();
+    </script>
+</body>
+</html>
