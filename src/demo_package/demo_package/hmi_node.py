@@ -37,20 +37,9 @@ class HMINode(Node):
             image_data = buffer.tobytes()
         self.latest_image = image_data
 
-    def start_image_timer(self):
-        self.image_timer = threading.Timer(5.0, self.update_image_data)  # Update image every 5 seconds
-        self.image_timer.daemon = True
-        self.image_timer.start()
-
-    def update_image_data(self):
-        while True:
-            with image_mutex:
-                self.latest_image = image_data
-            time.sleep(5.0)  # Wait for the next update
-
 @app.route('/')
 def index():
-    return render_template('/home.html')
+    return render_template('/test.html')
 
 @app.route('/get_image')
 def get_image():

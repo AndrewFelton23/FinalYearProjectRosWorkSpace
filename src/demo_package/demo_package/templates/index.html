@@ -15,7 +15,7 @@
         function updateImage() {
             var img = document.getElementById('video_feed');
             img.src = "{{ url_for('get_image') }}?" + new Date().getTime(); // Add a timestamp to prevent caching
-            setTimeout(updateImage, 300); // Update every 3 seconds (adjust as needed)
+            setTimeout(updateImage, 3000); // Update every 3 seconds (adjust as needed)
         }
 
         // Call the updateImage function to start updating the image

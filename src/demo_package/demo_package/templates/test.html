@@ -52,7 +52,7 @@
             <div class="middle-container">
                 <!-- Middle container content goes here -->
                 <div class="video-container">
-                    <img id="video-feed" src="{{ url_for('get_image') }}" alt="Camera Image">
+                    <img id="video_feed" src="{{ url_for('get_image') }}" alt="Camera Image" style="width: auto; height: 320px;">
                 </div>
                 <div class="cycles-status">
                     <div class="cycles">
@@ -119,10 +119,16 @@
             <p>Contact Email: s219064164@mandela.ac.za</p>
         </footer>
     </div>
-    <script src="{{ url_for('static', filename='videoscript.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='positionscript.js') }}"></script>
-    <script src="{{ url_for('static', filename='autoscript.js') }}"></script>
-    <script src="{{ url_for('static', filename='manualscript.js') }}"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+    <script>
+        // Function to update the image every few seconds
+        function updateImage() {
+            var img = document.getElementById('video_feed');
+            img.src = "{{ url_for('get_image') }}?" + new Date().getTime(); // Add a timestamp to prevent caching
+            setTimeout(updateImage, 3000); // Update every 3 seconds (adjust as needed)
+        }
+
+        // Call the updateImage function to start updating the image
+        updateImage();
+    </script>
 </body>
 </html>
