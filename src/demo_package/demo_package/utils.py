@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from math import atan2, cos, sin, degrees, radians
+import asyncio
 
 def stackImages(scale,imgArray):
     '''A method used to stack many images into a single frame'''
@@ -39,6 +40,7 @@ def empty(a):
 
 def getContours(img,imgContour,minArea, imgOrientation):
     '''A method used to get the contours of the image'''
+    print("gathering info")
     contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     for cnt in contours:
         area = cv2.contourArea(cnt)
