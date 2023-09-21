@@ -3,6 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg._compressed_image import CompressedImage
+from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
 from flask import Flask, Response, render_template, request, jsonify
@@ -22,7 +23,7 @@ class HMINode(Node):
         self.bridge_ = CvBridge()
         #create subscriber
         self.subscriber_ = self.create_subscription(CompressedImage,
-            'video_data',self.image_callback,10)
+            'vision_data',self.image_callback,10)
 
     def image_callback(self, img):
         '''video_data Subscriber callback function'''

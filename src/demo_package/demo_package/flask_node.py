@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg._compressed_image import CompressedImage
+from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
 from flask import Flask, Response, render_template, request, jsonify
@@ -22,14 +22,14 @@ class FlaskNode(Node):
         super().__init__('flask_node')
         self.bridge_ = CvBridge()
         #create subscriber
-        self.subscriber_ = self.create_subscription(CompressedImage,
-            'video_data',self.image_callback,10)
+        self.subscriber_ = self.create_subscription(Image,
+            '/image/vision',self.image_callback,10)
 
     def image_callback(self, img):
         '''video_data Subscriber callback function'''
         self.get_logger().info("Received new image from ROS 2")
         # convert the image back to a readable cv file
-        frame = self.bridge_.compressed_imgmsg_to_cv2(img, "passthrough")
+        frame = self.bridge_.imgmsg_to_cv2(img, "passthrough")
         # change the format of the frame
         ret, buffer = cv2.imencode('.jpg', frame)
         
@@ -39,7 +39,7 @@ class FlaskNode(Node):
         self.latest_image = image_data
 
     def start_image_timer(self):
-        self.image_timer = threading.Timer(5.0, self.update_image_data)  # Update image every 5 seconds
+        self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 5 seconds
         self.image_timer.daemon = True
         self.image_timer.start()
 

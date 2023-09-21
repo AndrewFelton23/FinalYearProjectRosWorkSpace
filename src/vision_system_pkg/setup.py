@@ -20,8 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'streamer_node = vision_system_pkg.streamer_node:main',
-            'hmi_node = vision_system_pkg.hmi_node:main'
+            'hmi_node = vision_system_pkg.hmi_node:main',
+            'image_publisher_node = vision_system_pkg.image_publisher_node:main',
+            'vision_sensor_node = vision_system_pkg.vision_sensor_node:main'
         ],
     },
 )
