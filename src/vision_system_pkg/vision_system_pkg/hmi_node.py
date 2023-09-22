@@ -23,6 +23,9 @@ class HMINode(Node):
         #create subscriber
         self.subscriber_ = self.create_subscription(Image,
             '/image/vision',self.image_callback,10)
+        #create subscriber
+        self.pub = self.create_publisher(String,
+            'hmi_button_command', 10)
 
     def image_callback(self, img):
         '''video_data Subscriber callback function'''

@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             'hmi_node = vision_system_pkg.hmi_node:main',
             'image_publisher_node = vision_system_pkg.image_publisher_node:main',
-            'vision_sensor_node = vision_system_pkg.vision_sensor_node:main'
+            'vision_sensor_node = vision_system_pkg.vision_sensor_node:main',
+            'command_node = vision_system_pkg.command_node:main'
         ],
     },
 )
