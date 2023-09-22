@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'demo_package'
+package_name = 'conveyor_controller_pkg'
 
 setup(
     name=package_name,
@@ -14,18 +14,14 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='rock',
-    maintainer_email='rock@todo.todo',
+    maintainer_email='feltona6@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'streamer_node = demo_package.streamer_node:main',
-            'flask_node = demo_package.flask_node:main',
-            'hmi_node = demo_package.hmi_node:main',
-            'vision_node = demo_package.vision_node:main',
-            'image_publisher_node = demo_package.image_publisher_node:main',
-            'vision_sensor_node = demo_package.vision_sensor_node:main'
+            'my_node = conveyor_controller_pkg.my_node:main',
+            'conveyor_arduino_node = conveyor_controller_pkg.conveyor_arduino_node:main'
         ],
     },
 )
