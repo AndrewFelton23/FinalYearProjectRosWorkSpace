@@ -11,19 +11,12 @@ from rclpy.node import Node
 class ConveyorArduinoNode(Node):
     def __init__(self):
         super().__init__('conveyor_arduino_node')
-        self.srv = self.create_service(AddThreeInts, 'add_three_ints', self.add_three_ints_callback)        # CHANGE
         self.srv = self.create_service(ConveyorCommands, 'conveyor_commands', self.conveyor_commands_callback)        # CHANGE
-
-    def add_three_ints_callback(self, request, response):
-        response.sum = request.a + request.b + request.c                                                  # CHANGE
-        self.get_logger().info('Incoming request\na: %d b: %d c: %d' % (request.a, request.b, request.c)) # CHANGE
-
-        return response
+        self.get_logger().info('node has started') # CHANGE
 
     def conveyor_commands_callback(self, request, response):
-        response.completed = True                                         # CHANGE
         self.get_logger().info('Incoming request\ncommand: ' +  str(request.command)) # CHANGE
-
+        response.completed = True 
         return response
 
 def main(args=None):

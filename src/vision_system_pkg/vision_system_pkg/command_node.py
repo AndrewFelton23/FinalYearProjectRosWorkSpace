@@ -6,6 +6,7 @@ from std_msgs.msg._string import String
 import sys
 import rclpy
 from rclpy.node import Node
+from functools import partial
 
 
 class CommandNode(Node):
@@ -21,34 +22,29 @@ class CommandNode(Node):
 
     def send_command(self,com):
         '''Command client function to send a command'''
-        self.req.command = com
+        self.get_logger().info('Command ' + str(com.data) + ' recieved')
+        self.req.command = com.data
         self.future = self.cli.call_async(self.req)
+        self.future.add_done_callback(partial(self.callback_completed))
+
+    def callback_completed(self,future):
+        try:
+            response = self.future.result()
+            
+        except:
+            self.get_logger().error("service call failed %r" % (e,))
+
 
     def button_command_callback(self,command):
         '''hmi_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command))
         self.send_command(command)
-
+        # Do not block here, start a timer or callback for checking the future status
 
 def main(args=None):
     rclpy.init(args=args)
-
     command_node = CommandNode()
-    command_node.send_command()
-    while rclpy.ok():
-        rclpy.spin_once(command_node)
-        if command_node.future.done():
-            try:
-                response = command_node.future.result()
-            except Exception as e:
-                command_node.get_logger().info(
-                    'Service call failed %r' % (e,))
-            else:
-                command_node.get_logger().info(
-                    'Result of conveyor_commands: ' +                               # CHANGE
-                    str(response.completed)) # CHANGE
-            break
-
+    rclpy.spin(command_node)
     command_node.destroy_node()
     rclpy.shutdown()
 

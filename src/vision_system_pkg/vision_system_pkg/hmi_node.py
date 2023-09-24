@@ -3,6 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from std_msgs.msg._string import String
 import cv2
 from cv_bridge import CvBridge
 from flask import Flask, Response, render_template, request, jsonify
@@ -26,6 +27,10 @@ class HMINode(Node):
         #create subscriber
         self.pub = self.create_publisher(String,
             'hmi_button_command', 10)
+        self.timer_period = 1  # Check every 1 second
+        self.timer = self.create_timer(self.timer_period, self.publish_start_sequence)
+        self.start_sequence = None  # Initialize start_sequence as an instance variable
+
 
     def image_callback(self, img):
         '''video_data Subscriber callback function'''
@@ -40,8 +45,19 @@ class HMINode(Node):
             image_data = buffer.tobytes()
         self.latest_image = image_data
 
+    def publish_start_sequence(self):
+        if self.start_sequence is not None:  # Use self.start_sequence
+            msg = String()
+            if self.start_sequence == True:
+                msg.data = 'F'
+            else:
+                msg.data = 'S'
+            self.pub.publish(msg)
+            self.get_logger().info("Published " + msg.data)
+            self.start_sequence = None
+
     def start_image_timer(self):
-        self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 5 seconds
+        self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 1 seconds
         self.image_timer.daemon = True
         self.image_timer.start()
 
@@ -66,16 +82,12 @@ def get_image():
 # Define a route to receive commands from the web interface
 @app.route('/update_led_color', methods=['POST'])
 def update_led_color():
-    # Get the color information from the request's JSON payload
+    # Get the start information from the request's JSON payload
     data = request.get_json()
     started = data.get('start')
-    print("Start sequence: "+ str(started))
-
-    # Perform any required actions with the LED color
-    # For example, you can store it in a database or trigger a physical LED to change color
-
-    # You can also send a response back to the frontend if needed
-    # For this example, we'll simply send a success response
+    print("Start sequence: " + str(started))
+    # Set the start_sequence variable in the ROS node
+    hmi_node_instance.start_sequence = started  # Assuming 'hmi_node_instance' is your ROS node instance
     return jsonify({'message': 'LED color updated successfully'})
 
 @app.route('/manual_mode', methods=['POST'])
@@ -84,12 +96,6 @@ def manual_mode():
     Manualdata = request.get_json()
     mode = Manualdata.get('manualMode')
     print("Manual mode: " + str(mode))
-
-    # Perform any required actions with the LED color
-    # For example, you can store it in a database or trigger a physical LED to change color
-
-    # You can also send a response back to the frontend if needed
-    # For this example, we'll simply send a success response
     return jsonify({'message': 'LED color updated successfully'})
 
 @app.route('/get_coordinates')
@@ -104,9 +110,10 @@ def get_coordinates():
 
 def run_ros_node(args=None):
     rclpy.init(args=args)
-    hmi_node = HMINode()
-    rclpy.spin(hmi_node)
-    hmi_node.destroy_node()
+    global hmi_node_instance
+    hmi_node_instance = HMINode()
+    rclpy.spin(hmi_node_instance)
+    hmi_node_instance.destroy_node()
     rclpy.shutdown()
 
 def run_flask_app():
