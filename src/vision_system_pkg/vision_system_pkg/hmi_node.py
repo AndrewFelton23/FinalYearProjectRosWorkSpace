@@ -24,8 +24,11 @@ class HMINode(Node):
         #create subscriber
         self.subscriber_ = self.create_subscription(Image,
             '/image/vision',self.image_callback,10)
-        #create subscriber
-        self.pub = self.create_publisher(String,
+        #create conveyor start publisher
+        self.start_pub = self.create_publisher(String,
+            'hmi_button_command', 10)
+        #create manual mode publisher
+        self.manual_pub = self.create_publisher(String,
             'hmi_button_command', 10)
         self.timer_period = 1  # Check every 1 second
         self.timer = self.create_timer(self.timer_period, self.publish_start_sequence)
@@ -52,7 +55,7 @@ class HMINode(Node):
                 msg.data = 'F'
             else:
                 msg.data = 'S'
-            self.pub.publish(msg)
+            self.start_pub.publish(msg)
             self.get_logger().info("Published " + msg.data)
             self.start_sequence = None
 
@@ -80,8 +83,8 @@ def get_image():
             return jsonify({'error': 'Failed to capture image'})
 
 # Define a route to receive commands from the web interface
-@app.route('/update_led_color', methods=['POST'])
-def update_led_color():
+@app.route('/start_conveyor', methods=['POST'])
+def start_conveyor():
     # Get the start information from the request's JSON payload
     data = request.get_json()
     started = data.get('start')
@@ -96,6 +99,22 @@ def manual_mode():
     Manualdata = request.get_json()
     mode = Manualdata.get('manualMode')
     print("Manual mode: " + str(mode))
+    return jsonify({'message': 'LED color updated successfully'})
+
+@app.route('/auto_mode', methods=['POST'])
+def auto_mode():
+    # Get the color information from the request's JSON payload
+    Autodata = request.get_json()
+    mode = Autodata.get('autoMode')
+    print("Auto mode: " + str(mode))
+    return jsonify({'message': 'LED color updated successfully'})
+
+@app.route('/manual_move', methods=['POST'])
+def manual_move():
+    # Get the color information from the request's JSON payload
+    Autodata = request.get_json()
+    mode = Autodata.get('autoMode')
+    print("Auto mode: " + str(mode))
     return jsonify({'message': 'LED color updated successfully'})
 
 @app.route('/get_coordinates')

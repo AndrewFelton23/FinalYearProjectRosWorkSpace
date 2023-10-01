@@ -54,16 +54,6 @@
                 <div class="video-container">
                     <img id="video_feed" src="{{ url_for('get_image') }}" alt="Camera Image" style="width: auto; height: 320px;">
                 </div>
-                <div class="cycles-status">
-                    <div class="cycles">
-                        <h4>Number of Uninterrupted Cycles</h4>
-                        <div id="cycles-response"></div>
-                    </div>
-                    <div class="status">
-                        <h4>Robot Status</h4>
-                        <div id="status-response"></div>
-                    </div>
-                </div>
                 <div class="auto-control">
                     <div class="auto-controller">
                         <h2>Automatic Control Mode</h2>
@@ -76,11 +66,6 @@
                             <button id="auto-offBtn" class="off-button">Off</button>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="right-container">
-                <!-- Right container content goes here -->
-                <div class="manual-control">
                     <div class="manual-controller">
                         <h2>Manual Control Mode</h2>
                         <div class="on-panel">
@@ -92,21 +77,34 @@
                             <button id="manual-offBtn" class="off-button">Off</button>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="right-container">
+                <!-- Right container content goes here -->
+                <div class="manual-control">
                     <div>
                         <h3>Robot Control</h3>
                         <div class="robot-control">
-                            <button class="robot-button">Return To Home</button>
-                            <button class="robot-button">Inspect Next Part</button>  
+                            <button id="RHome" class="robot-button">Return To Home</button>
+                            <button id="SPos" class="robot-button">Save Position</button>  
                         </div>
                         <h3>Gripper Control</h3>
                         <div class="robot-control">
-                            <button class="robot-button">Open Gripper</button> 
-                            <button class="robot-button">Close Gripper</button>                 
+                            <button id="OGripper" class="robot-button">Open Gripper</button> 
+                            <button id="CGripper" class="robot-button">Close Gripper</button>                 
                         </div>
-                        <h3>Conveyor Control</h3>
+                        <h3>Calibration Control</h3>
                         <div class="robot-control">
-                            <button class="robot-button">Start Conveyor</button> 
-                            <button class="robot-button">Stop Conveyor</button>                 
+                            <button id="X+" class="robot-button">X+</button> 
+                            <button id="X-" class="robot-button">X-</button>                    
+                        </div>
+                        <div class="robot-control">
+                            <button id="Y+" class="robot-button">Y+</button> 
+                            <button id="Y-" class="robot-button">Y-</button>                    
+                        </div>
+                        <div class="robot-control">
+                            <button id="Z+" class="robot-button">Z+</button> 
+                            <button id="Z-" class="robot-button">Z-</button>                    
                         </div>
                     </div>
                 </div>
@@ -170,6 +168,21 @@
             const onBtn = document.getElementById('manual-onBtn');
             const offBtn = document.getElementById('manual-offBtn');
 
+            const Xp = document.getElementById('X+');
+            const Xm = document.getElementById('X-');
+
+            const Yp = document.getElementById('Y+');
+            const Ym = document.getElementById('Y-');
+
+            const Zp = document.getElementById('Z+');
+            const Zm = document.getElementById('Z-');
+
+            const OGripper = document.getElementById('OGripper');
+            const CGripper = document.getElementById('CGripper');
+
+            const SPos = document.getElementById('SPos');
+            const RHome = document.getElementById('RHome');
+
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,autoMode) {
                 autoonledElement.style.backgroundColor = onColor;
@@ -180,10 +193,26 @@
 
                 if (autoMode) {
                     //If the program has started
-                    onBtn.setAttribute('disabled',true)
-                    offBtn.setAttribute('disabled',true)
+                    onBtn.setAttribute('disabled',true);
+                    offBtn.setAttribute('disabled',true);
                     onledElement.style.backgroundColor = '#e4e4e4';
-                    offledElement.style.backgroundColor = '#DE7373'
+                    offledElement.style.backgroundColor = '#DE7373';
+
+                    Xp.setAttribute('disabled',true);
+                    Xm.setAttribute('disabled',true);
+
+                    Yp.setAttribute('disabled',true);
+                    Ym.setAttribute('disabled',true);
+
+                    Zp.setAttribute('disabled',true);
+                    Zm.setAttribute('disabled',true);
+
+                    OGripper.setAttribute('disabled',true);
+                    CGripper.setAttribute('disabled',true);
+
+                    SPos.setAttribute('disabled',true);
+                    RHome.setAttribute('disabled',true);
+                    
                 } else {
                     //If the program has not started
                     onBtn.removeAttribute('disabled')
@@ -191,7 +220,7 @@
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
-                fetch('/manual_mode', {
+                fetch('/auto_mode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -246,7 +275,20 @@
             const autoonledElement = document.getElementById('auto-on-led');
             const autooffledElement = document.getElementById('auto-off-led');
 
+            const Xp = document.getElementById('X+');
+            const Xm = document.getElementById('X-');
 
+            const Yp = document.getElementById('Y+');
+            const Ym = document.getElementById('Y-');
+
+            const Zp = document.getElementById('Z+');
+            const Zm = document.getElementById('Z-');
+
+            const OGripper = document.getElementById('OGripper');
+            const CGripper = document.getElementById('CGripper');
+
+            const SPos = document.getElementById('SPos');
+            const RHome = document.getElementById('RHome');
 
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,manualMode) {
@@ -258,14 +300,45 @@
 
                 if (manualMode) {
                     //If the program has started
-                    autoonBtn.setAttribute('disabled',true)
-                    autooffBtn.setAttribute('disabled',true)
+                    autoonBtn.setAttribute('disabled',true);
+                    autooffBtn.setAttribute('disabled',true);
                     autoonledElement.style.backgroundColor = '#e4e4e4';
-                    autooffledElement.style.backgroundColor = '#DE7373'
+                    autooffledElement.style.backgroundColor = '#DE7373';
+
+                    Xp.removeAttribute('disabled');
+                    Xm.removeAttribute('disabled');
+
+                    Yp.removeAttribute('disabled');
+                    Ym.removeAttribute('disabled');
+
+                    Zp.removeAttribute('disabled');
+                    Zm.removeAttribute('disabled');
+
+
+                    OGripper.removeAttribute('disabled');
+                    CGripper.removeAttribute('disabled');
+
+                    SPos.removeAttribute('disabled');
+                    RHome.removeAttribute('disabled');
                 } else {
                     //If the program has not started
-                    autoonBtn.removeAttribute('disabled')
-                    autooffBtn.removeAttribute('disabled')
+                    autoonBtn.removeAttribute('disabled',true);
+                    autooffBtn.removeAttribute('disabled',true);
+
+                    Xp.setAttribute('disabled',true);
+                    Xm.setAttribute('disabled',true);
+
+                    Yp.setAttribute('disabled',true);
+                    Ym.setAttribute('disabled',true);
+
+                    Zp.setAttribute('disabled',true);
+                    Zm.setAttribute('disabled',true);
+
+                    OGripper.removeAttribute('disabled',true);
+                    CGripper.removeAttribute('disabled',true);
+
+                    SPos.setAttribute('disabled',true);
+                    RHome.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -331,6 +404,22 @@
             const autoonledElement = document.getElementById('auto-on-led');
             const autooffledElement = document.getElementById('auto-off-led');
 
+            const Xp = document.getElementById('X+');
+            const Xm = document.getElementById('X-');
+
+            const Yp = document.getElementById('Y+');
+            const Ym = document.getElementById('Y-');
+
+            const Zp = document.getElementById('Z+');
+            const Zm = document.getElementById('Z-');
+
+            const OGripper = document.getElementById('OGripper');
+            const CGripper = document.getElementById('CGripper');
+
+            const SPos = document.getElementById('SPos');
+            const RHome = document.getElementById('RHome');
+
+
             // Function to update the LED color
             function updateLEDColor(startColor,stopColor,started) {
                 StartledElement.style.backgroundColor = startColor;
@@ -355,10 +444,25 @@
                     autooffBtn.setAttribute('disabled',true);
                     autoonledElement.style.backgroundColor = '#e4e4e4';
                     autooffledElement.style.backgroundColor = '#DE7373';
+
+                    Xp.setAttribute('disabled',true);
+                    Xm.setAttribute('disabled',true);
+
+                    Yp.setAttribute('disabled',true);
+                    Ym.setAttribute('disabled',true);
+
+                    Zp.setAttribute('disabled',true);
+                    Zm.setAttribute('disabled',true);
+
+                    OGripper.setAttribute('disabled',true);
+                    CGripper.setAttribute('disabled',true);
+
+                    SPos.setAttribute('disabled',true);
+                    RHome.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
-                fetch('/update_led_color', {
+                fetch('/start_conveyor', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
