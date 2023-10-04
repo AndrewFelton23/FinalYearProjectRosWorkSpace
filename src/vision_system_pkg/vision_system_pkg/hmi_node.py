@@ -29,10 +29,13 @@ class HMINode(Node):
             'hmi_button_command', 10)
         #create manual mode publisher
         self.manual_pub = self.create_publisher(String,
-            'hmi_button_command', 10)
+            'robot_command', 10)
         self.timer_period = 1  # Check every 1 second
-        self.timer = self.create_timer(self.timer_period, self.publish_start_sequence)
-        self.start_sequence = None  # Initialize start_sequence as an instance variable
+        self.timer = self.create_timer(self.timer_period, self.publish_commands_sequence)
+        self.start_sequence = None  
+        self.manual_mode = None
+        self.auto_mode = None
+        self.manual_command = None
 
 
     def image_callback(self, img):
@@ -48,16 +51,36 @@ class HMINode(Node):
             image_data = buffer.tobytes()
         self.latest_image = image_data
 
-    def publish_start_sequence(self):
-        if self.start_sequence is not None:  # Use self.start_sequence
+    def publish_commands_sequence(self):
+        if self.start_sequence is not None:  
             msg = String()
             if self.start_sequence == True:
                 msg.data = 'F'
             else:
                 msg.data = 'S'
             self.start_pub.publish(msg)
-            self.get_logger().info("Published " + msg.data)
+            self.get_logger().info("Published on start_pub: " + msg.data)
             self.start_sequence = None
+        if self.manual_mode is not None:  
+            if self.manual_mode == True:  
+                command = String()
+                if self.manual_command is not None:  
+                    command.data = self.manual_command
+                    self.manual_pub.publish(command)
+                    self.get_logger().info("Published on manual_pub: " + command.data)
+                    self.manual_command = None
+            else:
+                self.manual_command = None
+                self.manual_mode = None
+        # if self.auto_mode is not None:  
+        #     msg = String()
+        #     if self.auto_mode == True:
+        #         msg.data = 'True' 
+        #     else:
+        #         msg.data = 'False'
+        #     self.auto_pub.publish(msg)
+        #     self.get_logger().info("Published on auto_pub: " + msg.data)
+        #     self.auto_mode = None
 
     def start_image_timer(self):
         self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 1 seconds
@@ -99,6 +122,7 @@ def manual_mode():
     Manualdata = request.get_json()
     mode = Manualdata.get('manualMode')
     print("Manual mode: " + str(mode))
+    hmi_node_instance.manual_mode = mode
     return jsonify({'message': 'LED color updated successfully'})
 
 @app.route('/auto_mode', methods=['POST'])
@@ -107,15 +131,16 @@ def auto_mode():
     Autodata = request.get_json()
     mode = Autodata.get('autoMode')
     print("Auto mode: " + str(mode))
+    hmi_node_instance.auto_mode = mode
     return jsonify({'message': 'LED color updated successfully'})
 
-@app.route('/manual_move', methods=['POST'])
-def manual_move():
-    # Get the color information from the request's JSON payload
-    Autodata = request.get_json()
-    mode = Autodata.get('autoMode')
-    print("Auto mode: " + str(mode))
-    return jsonify({'message': 'LED color updated successfully'})
+@app.route('/send_robot_command', methods=['POST'])
+def send_command():
+    command = request.form.get('command')
+    print("Received command:", command)
+    # Handle the command as needed
+    hmi_node_instance.manual_command = command
+    return 'Command received'
 
 @app.route('/get_coordinates')
 def get_coordinates():

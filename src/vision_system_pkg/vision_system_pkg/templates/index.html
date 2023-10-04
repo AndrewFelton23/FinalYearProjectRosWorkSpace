@@ -86,7 +86,10 @@
                         <h3>Robot Control</h3>
                         <div class="robot-control">
                             <button id="RHome" class="robot-button">Return To Home</button>
-                            <button id="SPos" class="robot-button">Save Position</button>  
+                            <button id="SPos" class="robot-button">Save Drop off Position</button>  
+                        </div>
+                        <div class="robot-control">
+                            <button id="CalibratePos" class="robot-button">Calibrate Position</button>  
                         </div>
                         <h3>Gripper Control</h3>
                         <div class="robot-control">
@@ -182,6 +185,8 @@
 
             const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
+            const CalibratePos = document.getElementById('CalibratePos');
+
 
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,autoMode) {
@@ -212,6 +217,7 @@
 
                     SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
+                    CalibratePos.setAttribute('disabled',true);
                     
                 } else {
                     //If the program has not started
@@ -289,6 +295,7 @@
 
             const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
+            const CalibratePos = document.getElementById('CalibratePos');
 
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,manualMode) {
@@ -320,6 +327,7 @@
 
                     SPos.removeAttribute('disabled');
                     RHome.removeAttribute('disabled');
+                    CalibratePos.removeAttribute('disabled');
                 } else {
                     //If the program has not started
                     autoonBtn.removeAttribute('disabled',true);
@@ -334,11 +342,12 @@
                     Zp.setAttribute('disabled',true);
                     Zm.setAttribute('disabled',true);
 
-                    OGripper.removeAttribute('disabled',true);
-                    CGripper.removeAttribute('disabled',true);
+                    OGripper.setAttribute('disabled',true);
+                    CGripper.setAttribute('disabled',true);
 
                     SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
+                    CalibratePos.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -418,6 +427,7 @@
 
             const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
+            const CalibratePos = document.getElementById('CalibratePos');
 
 
             // Function to update the LED color
@@ -459,6 +469,7 @@
 
                     SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
+                    CalibratePos.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -516,5 +527,37 @@
             updateLEDColor(startinitialColor,stopinitialColor,flag);
             });
     </script>
+    <script>
+        function sendCommand(command) {
+            fetch('/send_robot_command', {
+                method: 'POST',
+                body: new URLSearchParams({ 'command': command }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data); // Log the response from the server
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        // Attach click event handlers to the buttons
+        document.getElementById('RHome').addEventListener('click', () => sendCommand('Return To Home'));
+        document.getElementById('SPos').addEventListener('click', () => sendCommand('Save Drop off Position'));
+        document.getElementById('CalibratePos').addEventListener('click', () => sendCommand('Calibrate Position'));
+        document.getElementById('OGripper').addEventListener('click', () => sendCommand('Open Gripper'));
+        document.getElementById('CGripper').addEventListener('click', () => sendCommand('Close Gripper'));
+        document.getElementById('X+').addEventListener('click', () => sendCommand('X+'));
+        document.getElementById('X-').addEventListener('click', () => sendCommand('X-'));
+        document.getElementById('Y+').addEventListener('click', () => sendCommand('Y+'));
+        document.getElementById('Y-').addEventListener('click', () => sendCommand('Y-'));
+        document.getElementById('Z+').addEventListener('click', () => sendCommand('Z+'));
+        document.getElementById('Z-').addEventListener('click', () => sendCommand('Z-'));
+        // Add click event handlers for other buttons as needed
+    </script>    
 </body>
 </html>

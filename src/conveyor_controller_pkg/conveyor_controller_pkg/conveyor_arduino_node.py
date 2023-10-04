@@ -3,9 +3,14 @@
 from tutorial_interfaces.srv import AddThreeInts     # CHANGE
 from tutorial_interfaces.srv import ConveyorCommands     # CHANGE
 from std_msgs.msg._string import String
+from serial import Serial
+import time
 
 import rclpy
 from rclpy.node import Node
+
+# Define the serial port and baud rate
+ser = Serial('/dev/ttyUSB0', 9600)  # Change 'COM3' to your Arduino's serial port
 
 
 class ConveyorArduinoNode(Node):
@@ -16,6 +21,8 @@ class ConveyorArduinoNode(Node):
 
     def conveyor_commands_callback(self, request, response):
         self.get_logger().info('Incoming request\ncommand: ' +  str(request.command)) # CHANGE
+        com = str(request.command)
+        ser.write(com.encode())
         response.completed = True 
         return response
 

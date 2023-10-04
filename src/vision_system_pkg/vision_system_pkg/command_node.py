@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from tutorial_interfaces.srv import AddThreeInts       # CHANGE
 from tutorial_interfaces.srv import ConveyorCommands       # CHANGE
+from tutorial_interfaces.srv import RobotCommands       # CHANGE
 from std_msgs.msg._string import String
 import sys
 import rclpy
@@ -16,9 +16,15 @@ class CommandNode(Node):
         self.cli = self.create_client(ConveyorCommands, 'conveyor_commands')       
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
-        self.req = ConveyorCommands.Request()              
+        self.cli_robot = self.create_client(ConveyorCommands, 'conveyor_commands')       
+        while not self.cli_robot.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+        self.req = ConveyorCommands.Request()
+        self.reqRobot = RobotCommands.Request()                     
         self.subscriber_ = self.create_subscription(String,
-            'hmi_button_command',self.button_command_callback,10)         
+            'hmi_button_command',self.start_command_callback,10)         
+        self.subscriber_ = self.create_subscription(String,
+            'robot_command',self.robot_command_callback,10)         
 
     def send_command(self,com):
         '''Command client function to send a command'''
@@ -27,19 +33,32 @@ class CommandNode(Node):
         self.future = self.cli.call_async(self.req)
         self.future.add_done_callback(partial(self.callback_completed))
 
+    def send_robot_command(self,com):
+        '''Command client function to send a command'''
+        self.get_logger().info('Command ' + str(com.data) + ' recieved')
+        self.req.command = com.data
+        self.future = self.cli.call_async(self.req)
+        self.future.add_done_callback(partial(self.callback_completed))
+
     def callback_completed(self,future):
+        '''Client to check if the service works'''
         try:
             response = self.future.result()
-            
         except:
             self.get_logger().error("service call failed %r" % (e,))
 
 
-    def button_command_callback(self,command):
-        '''hmi_button_command Subscriber callback function'''
+    def start_command_callback(self,command):
+        '''start_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command))
         self.send_command(command)
-        # Do not block here, start a timer or callback for checking the future status
+
+    def robot_command_callback(self,command):
+        '''start_button_command Subscriber callback function'''
+        self.get_logger().info("instruction recieved: " + str(command.data))
+
+        # send service message
+        # self.send_command(command)
 
 def main(args=None):
     rclpy.init(args=args)
