@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_node = robot_controller_pkg.my_node:main'
+            'my_node = robot_controller_pkg.my_node:main',
+            'robot_arduino_node = robot_controller_pkg.robot_arduino_node:main'
         ],
     },
 )
