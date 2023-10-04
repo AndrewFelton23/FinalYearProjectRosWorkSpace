@@ -1,4 +1,5 @@
 /* Reset some default browser styles */
+
 body, html {
     margin: 0;
     padding: 0;
@@ -216,7 +217,8 @@ p {
     margin-bottom: 5px; /* Add a gap below the .status-container */
 }
 .auto-control,
-.manual-control {
+.manual-control,
+.manual-controller {
     background-color: #F9F8F7;
     width:90%;
     height: fit-content;
@@ -310,6 +312,10 @@ p {
     box-shadow: none; /* Remove the box shadow when the button is pressed */
     background-color: #ccc; /* Change the background color when the button is pressed */
     transform: translateY(1px); /* Add a slight y-axis translation for a pressed effect */
+}
+
+.robot-button:enabled {
+    background-color: #f0f0f0;
 }
 
 .robot-button:disabled {
