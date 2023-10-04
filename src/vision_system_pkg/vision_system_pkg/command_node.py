@@ -16,7 +16,7 @@ class CommandNode(Node):
         self.cli = self.create_client(ConveyorCommands, 'conveyor_commands')       
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
-        self.cli_robot = self.create_client(ConveyorCommands, 'conveyor_commands')       
+        self.cli_robot = self.create_client(RobotCommands, 'robot_commands')       
         while not self.cli_robot.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
         self.req = ConveyorCommands.Request()
@@ -36,8 +36,8 @@ class CommandNode(Node):
     def send_robot_command(self,com):
         '''Command client function to send a command'''
         self.get_logger().info('Command ' + str(com.data) + ' recieved')
-        self.req.command = com.data
-        self.future = self.cli.call_async(self.req)
+        self.reqRobot.command = com.data
+        self.future = self.cli_robot.call_async(self.reqRobot)
         self.future.add_done_callback(partial(self.callback_completed))
 
     def callback_completed(self,future):
@@ -56,7 +56,7 @@ class CommandNode(Node):
     def robot_command_callback(self,command):
         '''start_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command.data))
-
+        self.send_robot_command(command)  
         # send service message
         # self.send_command(command)
 
