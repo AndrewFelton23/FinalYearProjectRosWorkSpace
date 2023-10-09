@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from math import atan2, cos, sin, degrees, radians
-import asyncio
 
 def stackImages(scale,imgArray):
     '''A method used to stack many images into a single frame'''
@@ -38,25 +37,28 @@ def stackImages(scale,imgArray):
 def empty(a):
     pass
 
-def getContours(img,imgContour,minArea, imgOrientation):
+def getContours(img,imgContour,minArea,maxArea, imgOrientation):
     '''A method used to get the contours of the image'''
-    print("gathering info")
     contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    center = None
+    angle_deg = None
+    x = 0
+    y = 0
+    w = 0
+    h = 0
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > minArea:
-            
+        if minArea < area < maxArea:
             cv2.drawContours(imgContour,cnt, -1, (255, 0, 255), 7)
             peri = cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
-            # print(len(approx))
             x, y, w, h = cv2.boundingRect(approx)
             cv2.rectangle(imgContour, (x, y),(x+w,y+h), (0, 255, 0), 5)
 
             cv2.putText(imgContour, "Points: " + str(len(approx)),(x+w+20, y+20),cv2.FONT_HERSHEY_COMPLEX,.7,(0,255,0),2)
 
             cv2.putText(imgContour, "Area: " + str(int(area)),(x+w+20, y+45),cv2.FONT_HERSHEY_COMPLEX,.7,(0,255,0),2)
-            if len(approx) == 4:  # Check if the contour is a quadrilateral (square)
+            if 6>=len(approx) >= 4:  # Check if the contour is a quadrilateral (square)
                 x, y, w, h = cv2.boundingRect(approx)
                 cv2.rectangle(imgContour, (x, y), (x + w, y + h), (0, 255, 0), 5)
 
@@ -76,13 +78,12 @@ def getContours(img,imgContour,minArea, imgOrientation):
                 angle_deg = degrees(angle_rad)
                 if angle_deg < 0:
                     angle_deg += 180  # Adjust the angle range if needed
-                print('the angle of rotation is ' + str(angle_deg))
                 cv2.putText(imgOrientation, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX, .7, (0, 255, 0), 2)
                 cv2.putText(imgOrientation, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, .7, (0, 255, 0), 2)
                 cv2.putText(imgOrientation, "Angle: " + str(round(angle_deg, 2)), (x + w + 20, y + 70), cv2.FONT_HERSHEY_COMPLEX, .7, (0, 255, 0), 2)
+                cv2.putText(imgOrientation, "Center: " + str(center), (x + w + 20, y + 95), cv2.FONT_HERSHEY_COMPLEX, .7, (0, 255, 0), 2)
                 draw_axes(imgOrientation, center, angle_deg, max(w, h))
-                return angle_deg
-
+    return center, angle_deg, (x + w // 2), ( y + h // 2)
 
 ##UNDER DEVELOPMENT
 def getHoughTranform(image, edges, rho = 1,theta= np.pi / 180, thresh = 100):

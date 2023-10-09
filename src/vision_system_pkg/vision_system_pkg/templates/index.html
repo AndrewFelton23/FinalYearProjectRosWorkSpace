@@ -86,10 +86,11 @@
                         <h3>Robot Control</h3>
                         <div class="robot-control">
                             <button id="RHome" class="robot-button">Return To Home</button>
-                            <button id="SPos" class="robot-button">Save Drop off Position</button>  
+                            <button id="CalibratePos" class="robot-button">Calibrate Position</button>
                         </div>
                         <div class="robot-control">
-                            <button id="CalibratePos" class="robot-button">Calibrate Position</button>  
+                            <h3>Steps to move</h3>
+                            <input type="number" id="integerInput" name="integerInput" min="0" step="1">
                         </div>
                         <h3>Gripper Control</h3>
                         <div class="robot-control">
@@ -183,7 +184,6 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
 
-            const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
             const CalibratePos = document.getElementById('CalibratePos');
 
@@ -215,7 +215,6 @@
                     OGripper.setAttribute('disabled',true);
                     CGripper.setAttribute('disabled',true);
 
-                    SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
                     CalibratePos.setAttribute('disabled',true);
                     
@@ -293,7 +292,6 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
 
-            const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
             const CalibratePos = document.getElementById('CalibratePos');
 
@@ -325,7 +323,6 @@
                     OGripper.removeAttribute('disabled');
                     CGripper.removeAttribute('disabled');
 
-                    SPos.removeAttribute('disabled');
                     RHome.removeAttribute('disabled');
                     CalibratePos.removeAttribute('disabled');
                 } else {
@@ -345,7 +342,6 @@
                     OGripper.setAttribute('disabled',true);
                     CGripper.setAttribute('disabled',true);
 
-                    SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
                     CalibratePos.setAttribute('disabled',true);
                 }
@@ -425,7 +421,7 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
 
-            const SPos = document.getElementById('SPos');
+
             const RHome = document.getElementById('RHome');
             const CalibratePos = document.getElementById('CalibratePos');
 
@@ -546,17 +542,46 @@
         }
     
         // Attach click event handlers to the buttons
-        document.getElementById('RHome').addEventListener('click', () => sendCommand('Return To Home'));
-        document.getElementById('SPos').addEventListener('click', () => sendCommand('Save Drop off Position'));
-        document.getElementById('CalibratePos').addEventListener('click', () => sendCommand('Calibrate Position'));
-        document.getElementById('OGripper').addEventListener('click', () => sendCommand('Open Gripper'));
-        document.getElementById('CGripper').addEventListener('click', () => sendCommand('Close Gripper'));
-        document.getElementById('X+').addEventListener('click', () => sendCommand('X+'));
-        document.getElementById('X-').addEventListener('click', () => sendCommand('X-'));
-        document.getElementById('Y+').addEventListener('click', () => sendCommand('Y+'));
-        document.getElementById('Y-').addEventListener('click', () => sendCommand('Y-'));
-        document.getElementById('Z+').addEventListener('click', () => sendCommand('Z+'));
-        document.getElementById('Z-').addEventListener('click', () => sendCommand('Z-'));
+        document.getElementById('RHome').addEventListener('click', () => sendCommand('H'));
+        document.getElementById('CalibratePos').addEventListener('click', () => sendCommand('CP'));
+        document.getElementById('OGripper').addEventListener('click', () => sendCommand('OG'));
+        document.getElementById('CGripper').addEventListener('click', () => sendCommand('CG'));
+        document.getElementById('X+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'x+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('X-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'x-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Y+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'y+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Y-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'y-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Z+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'z+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Z-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'z-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
         // Add click event handlers for other buttons as needed
     </script>    
 </body>

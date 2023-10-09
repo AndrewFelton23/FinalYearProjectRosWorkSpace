@@ -23,7 +23,7 @@ class HMINode(Node):
         self.bridge_ = CvBridge()
         #create subscriber
         self.subscriber_ = self.create_subscription(Image,
-            '/image/vision',self.image_callback,10)
+            "/image",self.image_callback,10)
         #create conveyor start publisher
         self.start_pub = self.create_publisher(String,
             'hmi_button_command', 10)

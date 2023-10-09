@@ -26,6 +26,8 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Num.msg"
   "msg/Sphere.msg"
+  "msg/Joints.msg"
+  "msg/Vision.msg"
   "srv/AddThreeInts.srv"
   "srv/ConveyorCommands.srv"
   "srv/RobotCommands.srv"
