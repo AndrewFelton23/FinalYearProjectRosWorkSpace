@@ -21,9 +21,11 @@ class CommandNode(Node):
             self.get_logger().info('service not available, waiting again...')
         self.req = ConveyorCommands.Request()
         self.reqRobot = RobotCommands.Request()                     
-        self.subscriber_ = self.create_subscription(String,
-            'hmi_button_command',self.start_command_callback,10)         
-        self.subscriber_ = self.create_subscription(String,
+        self.subscriber_1 = self.create_subscription(String,
+            'hmi_button_command',self.start_command_callback,10)     
+        self.subscriber_2 = self.create_subscription(String,
+            'found_part',self.start_command_callback,10)            
+        self.subscriber_3 = self.create_subscription(String,
             'robot_command',self.robot_command_callback,10)         
 
     def send_command(self,com):
@@ -49,6 +51,11 @@ class CommandNode(Node):
 
 
     def start_command_callback(self,command):
+        '''start_button_command Subscriber callback function'''
+        self.get_logger().info("instruction recieved: " + str(command))
+        self.send_command(command)
+    
+    def found_command_callback(self,command):
         '''start_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command))
         self.send_command(command)

@@ -3,7 +3,9 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from std_msgs.msg._string import String
 from tutorial_interfaces.msg import Vision
+
 import cv2
 from cv_bridge import CvBridge
 import pickle
@@ -29,48 +31,56 @@ class VisionSensorNode(Node):
     def __init__(self):
         super().__init__('vision_sensor_node')
         self.bridge_ = CvBridge()
+        self.found = False
         #create subscriber
         self.subscriber_ = self.create_subscription(Image,
             '/image',self.vision_callback,10)
         #create the publisher
-        self.publisher_ = self.create_publisher(Vision, '/vision', 10) 
+        self.publisher_1 = self.create_publisher(Vision, '/vision', 10) 
+        self.publisher_2 = self.create_publisher(String, 'found_part', 10) 
 
 
     def vision_callback(self, img):
         '''video_data Subscriber callback function for vision system'''
         self.get_logger().info("Received new image from ROS 2")
         # convert the image back to a readable cv file
-        frame = self.bridge_.imgmsg_to_cv2(img, "passthrough")
-        # Undistort the input image
-        img = cv2.undistort(frame, cameraMatrix, dist, None, cameraMatrix)
-        imgContour = img.copy()
-        imgOrientation = img.copy()
-        imgBlur = cv2.GaussianBlur(img,(7,7),1)
-        imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
-        threshold1 = 85
-        threshold2 = 80
-        minArea = cv2.getTrackbarPos("Area","Parameters")
-        maxArea = 12000
-        imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
-        kernel = np.ones((5,5))
-        imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
+        img = self.bridge_.imgmsg_to_cv2(img, "passthrough")
+        if self.found != True: 
+            # Undistort the input image
+            # img = cv2.undistort(frame, cameraMatrix, dist, None, cameraMatrix)
+            imgContour = img.copy()
+            imgOrientation = img.copy()
+            imgBlur = cv2.GaussianBlur(img,(7,7),1)
+            imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
+            threshold1 = 70
+            threshold2 = 80
+            minArea = cv2.getTrackbarPos("Area","Parameters")
+            maxArea = 12000
+            imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
+            kernel = np.ones((5,5))
+            imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
 
-        center, angle, x, y = getContours(imgDil,imgContour,minArea,maxArea,imgOrientation)
-        if (y != None) :
-            if y < 240:
-                y_distance = 240 -y
-                y_distance_cm = (y_distance)*ratio_h
-                x_distance = 320 -x
-                x_distance_cm = (x_distance)*ratio_w
-                print("stop conveyor")
-                print("distance to y : " + str(y_distance_cm))
-                print("distance to x : " + str(x_distance_cm))
-                msg = Vision()
-                msg.angle = angle
-                msg.x = x_distance_cm
-                msg.y = y_distance_cm
-                self.publisher_.publish(msg)
-                self.get_logger().info("Published info")
+            center, angle, x, y = getContours(imgDil,imgContour,minArea,maxArea,imgOrientation)
+            if angle != None:
+                if y < 240:
+                    y_distance = 240 -y
+                    y_distance_cm = (y_distance)*ratio_h
+                    x_distance = 320 -x
+                    x_distance_cm = (x_distance)*ratio_w
+                    #stop the conveyor
+                    self.get_logger().info("stop conveyor")
+                    msg = String()
+                    msg.data = 'S'
+                    self.publisher_2.publish(msg)
+                    print("distance to y : " + str(y_distance_cm))
+                    print("distance to x : " + str(x_distance_cm))
+                    part = Vision()
+                    part.angle = angle
+                    part.x = x_distance_cm
+                    part.y = y_distance_cm
+                    self.publisher_1.publish(part)
+                    self.get_logger().info("Published info")
+                    self.found = True
 
 
         
