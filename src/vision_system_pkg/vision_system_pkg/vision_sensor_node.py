@@ -52,10 +52,10 @@ class VisionSensorNode(Node):
             imgOrientation = img.copy()
             imgBlur = cv2.GaussianBlur(img,(7,7),1)
             imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
-            threshold1 = 70
-            threshold2 = 80
-            minArea = cv2.getTrackbarPos("Area","Parameters")
-            maxArea = 12000
+            threshold1 = 40
+            threshold2 = 60
+            minArea = 5000
+            maxArea = 15000
             imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
             kernel = np.ones((5,5))
             imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
@@ -74,13 +74,14 @@ class VisionSensorNode(Node):
                     self.publisher_2.publish(msg)
                     print("distance to y : " + str(y_distance_cm))
                     print("distance to x : " + str(x_distance_cm))
+                    print("angle : " + str(angle))
                     part = Vision()
                     part.angle = angle
                     part.x = x_distance_cm
                     part.y = y_distance_cm
                     self.publisher_1.publish(part)
                     self.get_logger().info("Published info")
-                    self.found = True
+                    # self.found = True
 
 
         

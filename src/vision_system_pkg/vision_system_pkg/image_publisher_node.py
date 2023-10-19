@@ -22,11 +22,12 @@ class ImagePublisherNode(Node):
         while True:
             try:
                 r, frame = self.cap.read()
-                frame = cv2.undistort(frame, cameraMatrix, dist, None, cameraMatrix)
+                # frame = cv2.undistort(frame, cameraMatrix, dist, None, cameraMatrix)
+                frame = frame[:,80:540]
                 if not r:
                     return
                 self.pub.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
-                time.sleep(1)
+                time.sleep(0.1)
             except CvBridgeError as e:
                 print(e)
         self.cap.release()
