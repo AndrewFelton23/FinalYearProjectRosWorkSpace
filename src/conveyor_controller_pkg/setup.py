@@ -20,7 +20,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_node = conveyor_controller_pkg.my_node:main',
             'conveyor_arduino_node = conveyor_controller_pkg.conveyor_arduino_node:main'
         ],
     },
