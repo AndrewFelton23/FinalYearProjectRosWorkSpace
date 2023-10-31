@@ -81,7 +81,7 @@ class VisionSensorNode(Node):
                     part.y = y_distance_cm
                     self.publisher_1.publish(part)
                     self.get_logger().info("Published info")
-                    # self.found = True
+                    self.found = True
 
 
         
