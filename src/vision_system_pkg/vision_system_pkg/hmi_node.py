@@ -30,6 +30,9 @@ class HMINode(Node):
         #create manual mode publisher
         self.manual_pub = self.create_publisher(String,
             'robot_command', 10)
+        # create auto mode publisher
+        self.auto_pub = self.create_publisher(String,
+            'auto_command', 10)
         self.timer_period = 1  # Check every 1 second
         self.timer = self.create_timer(self.timer_period, self.publish_commands_sequence)
         self.start_sequence = None  
@@ -72,15 +75,15 @@ class HMINode(Node):
             else:
                 self.manual_command = None
                 self.manual_mode = None
-        # if self.auto_mode is not None:  
-        #     msg = String()
-        #     if self.auto_mode == True:
-        #         msg.data = 'True' 
-        #     else:
-        #         msg.data = 'False'
-        #     self.auto_pub.publish(msg)
-        #     self.get_logger().info("Published on auto_pub: " + msg.data)
-        #     self.auto_mode = None
+        if self.auto_mode is not None:  
+            msg = String()
+            if self.auto_mode == True:
+                msg.data = 'True' 
+            else:
+                msg.data = 'False'
+            self.auto_pub.publish(msg)
+            self.get_logger().info("Published on auto_pub: " + msg.data)
+            self.auto_mode = None
 
     def start_image_timer(self):
         self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 1 seconds

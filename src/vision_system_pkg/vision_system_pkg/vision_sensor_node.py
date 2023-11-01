@@ -31,8 +31,10 @@ class VisionSensorNode(Node):
     def __init__(self):
         super().__init__('vision_sensor_node')
         self.bridge_ = CvBridge()
-        self.found = False
+        self.found = True
         #create subscriber
+        self.auto_subscriber = self.create_subscription(String,
+            'auto_command',self.auto_callback,10)
         self.subscriber_ = self.create_subscription(Image,
             '/image',self.vision_callback,10)
         #create the publisher
@@ -82,6 +84,11 @@ class VisionSensorNode(Node):
                     self.publisher_1.publish(part)
                     self.get_logger().info("Published info")
                     self.found = True
+        
+    def auto_callback(self, msg):
+        self.get_logger().info("Auto mode has changed state to {}".format(msg.data))
+        self.found = msg.data
+        self.get_logger().info("starting vision system")
 
 
         

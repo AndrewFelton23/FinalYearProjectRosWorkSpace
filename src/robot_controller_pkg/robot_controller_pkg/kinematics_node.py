@@ -17,6 +17,8 @@ class KinematicsNode(Node):
         self.get_logger().info("Node has started")
         self.subscriber_ = self.create_subscription(Vision,
             '/vision',self.kinematics_callback,10)
+        self.publisher_robot_command = self.create_publisher(String,
+            'robot_command',10)         
         self.get_logger().info('node has started') 
 
     def kinematics_callback(self,msg):
@@ -109,13 +111,16 @@ class KinematicsNode(Node):
             # print("(x,y) value is ({},{}) in mm".format(str(xrp), str(yrp)))
 
         # move the x motor by theta 1
-        xMove = ((90)*stepsPerDeg/(ratio1*ratio2)) + theta1_steps
-        zMove = theta2_steps
+        xMove = round(((90)*stepsPerDeg/(ratio1*ratio2))) + output_steps_1
+        zMove = output_steps_2
         aCurrent = (90-theta1_deg+theta2_deg)
-        aMove = aCurrent - angle
-        self.get_logger().info("Theta 1 is {} and theta 2 is {}. This means that motor connected to X must move {} and Z {} the current orientation of the gripper is {}".format(theta1_act_deg,theta2_act_deg,xMove,zMove,aCurrent))
-        
-
+        aMove = round((aCurrent - angle)*stepsPerDeg/(ratio1*ratio2))
+        self.get_logger().info("Theta 1 is {} and theta 2 is {}. This means that motor connected to X must move {} and Z {} the current orientation of the gripper is {}".format(theta1_act_deg,theta2_act_deg,xMove,zMove,aMove))
+        self.get_logger().info("The x desired position is {} and the y desired position is {}. The x actual position is {} and the y actual position is {}.".format(str(xrp), str(yrp), str(x_act), str(y_act)))
+        command = String()
+        command.data = "Data,{},{},{}".format(xMove,zMove,aMove)
+        self.manual_pub.publish(command)
+        self.get_logger().info("Published on robot_command: " + command.data)
 
 def main(args=None):
     rclpy.init(args=args)

@@ -2,9 +2,12 @@
 
 from tutorial_interfaces.srv import RobotCommands
 from std_msgs.msg._string import String
+from serial import Serial
 
 import rclpy
 from rclpy.node import Node
+
+ser = Serial('/dev/ttyACM0', 9600)  # Change 'COM3' to your Arduino's serial port
 
 
 class RobotArduinoNode(Node):
@@ -15,8 +18,11 @@ class RobotArduinoNode(Node):
 
     def robot_commands_callback(self, request, response):
         self.get_logger().info('Incoming request\ncommand: ' +  str(request.command)) # CHANGE
+        com = str(request.command)
+        ser.write(com.encode())
         response.completed = True 
         return response
+
 
 def main(args=None):
     rclpy.init(args=args)
