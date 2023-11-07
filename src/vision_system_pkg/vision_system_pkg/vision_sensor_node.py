@@ -47,7 +47,7 @@ class VisionSensorNode(Node):
         self.get_logger().info("Received new image from ROS 2")
         # convert the image back to a readable cv file
         img = self.bridge_.imgmsg_to_cv2(img, "passthrough")
-        if self.found != True: 
+        if self.found == False: 
             # Undistort the input image
             # img = cv2.undistort(frame, cameraMatrix, dist, None, cameraMatrix)
             imgContour = img.copy()

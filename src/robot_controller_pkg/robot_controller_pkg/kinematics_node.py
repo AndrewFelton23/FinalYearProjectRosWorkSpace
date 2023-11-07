@@ -7,10 +7,6 @@ from tutorial_interfaces.msg import Vision
 import rclpy
 from rclpy.node import Node
 
-
-
-
-
 class KinematicsNode(Node):
     def __init__(self):
         super().__init__('kinematics_node')
@@ -27,14 +23,14 @@ class KinematicsNode(Node):
         flag1 = True
         flag2 = True
         flag3 = True
-        xrc = 250
+        xrc = 235
         yrc = 190
         L1 = 295
         L2 = 200
         InverseKinematics = True
         ForwardKinematics = True
-        d1 = 12.2
-        d2 = 37.7
+        d1 = 20
+        d2 = 60
         ratio1 = d1/d2
         ratio2 = d1/d2
         stepsPerDeg = 400/360
@@ -61,22 +57,12 @@ class KinematicsNode(Node):
             theta1_radians = atan2(xrp,yrp) - atan2((L2*sin(theta2_radians)), (L1 + L2*cos(theta2_radians)))
 
             theta2_deg = (theta2_radians / (2 * pi)) * 360
-            theta1_deg = (theta1_radians / (2 * pi)) * 360
-
-            # print("theta2 has the value {} radians".format(str(theta2_radians)))
-            # print("theta1 has the value {} radians".format(str(theta1_radians)))
-
-            # print("theta2 has the value {} degrees".format(str(theta2_deg)))
-            # print("theta1 has the value {} degrees".format(str(theta1_deg)))
-
+            theta1_deg = 90 + (theta1_radians / (2 * pi)) * 360
             theta1_steps = theta1_deg*stepsPerDeg/(ratio1*ratio2)
             theta2_steps = theta2_deg*stepsPerDeg/(ratio1*ratio2)
 
             output_steps_1 = round(theta1_steps)
             output_steps_2 = round(theta2_steps)
-
-            # print("number of steps to turn theta 2 {} degrees: {} steps".format(str(theta2_deg),str(output_steps_2)))
-            # print("number of steps to turn theta 1 {} degrees: {} steps".format(str(theta1_deg),str(output_steps_1)))
 
             # The error will be as follows
             theta1_act_deg = output_steps_1/stepsPerDeg*(ratio1*ratio2)
@@ -84,42 +70,27 @@ class KinematicsNode(Node):
 
             theta1_error = theta1_deg - theta1_act_deg
             theta2_error = theta2_deg - theta2_act_deg
-
-            # print("The error between {} and {} degrees: {} degrees".format(str(theta1_deg),str(theta1_act_deg),str(theta1_error)))
-            # print("The error between {} and {} degrees: {} degrees".format(str(theta2_deg),str(theta2_act_deg),str(theta2_error)))
-
             # calculate the current position using forward kinematics
             theta1_act_radians = (theta1_act_deg / 360) * 2 * pi
             theta2_act_radians = (theta2_act_deg / 360) * 2 * pi
             x_act = L1 * sin(theta1_act_radians) + L2 * sin(theta1_act_radians + theta2_act_radians)
             y_act = L1 * cos(theta1_act_radians) + L2 * cos(theta1_act_radians + theta2_act_radians)
-
-            # print("The desired position is ({},{}) and the actual position is ({},{}) in mm".format(str(xrp), str(yrp), str(x_act), str(y_act)))
-            # # calculate the number of steps required
         # Forward Kinematics
         if ForwardKinematics:
-            # theta1_deg = input("Please enter a theta1_deg value: ")
-            # theta2_deg = input("Please enter a theta2_deg value: ")
-            # theta1_deg = float(theta1_deg)
-            # theta2_deg = float(theta2_deg)
             theta1_radians = (theta1_deg / 360) * 2 * pi
             theta2_radians = (theta2_deg / 360) * 2 * pi
-
             xrp = L1 * sin(theta1_radians) + L2 * sin(theta1_radians + theta2_radians)
             yrp = L1 * cos(theta1_radians) + L2 * cos(theta1_radians + theta2_radians)
-
-            # print("(x,y) value is ({},{}) in mm".format(str(xrp), str(yrp)))
-
         # move the x motor by theta 1
-        xMove = round(((90)*stepsPerDeg/(ratio1*ratio2))) + output_steps_1
+        xMove = output_steps_1
         zMove = output_steps_2
-        aCurrent = (90-theta1_deg+theta2_deg)
+        aCurrent = (theta1_deg+theta2_deg)
         aMove = round((aCurrent - angle)*stepsPerDeg/(ratio1*ratio2))
         self.get_logger().info("Theta 1 is {} and theta 2 is {}. This means that motor connected to X must move {} and Z {} the current orientation of the gripper is {}".format(theta1_act_deg,theta2_act_deg,xMove,zMove,aMove))
         self.get_logger().info("The x desired position is {} and the y desired position is {}. The x actual position is {} and the y actual position is {}.".format(str(xrp), str(yrp), str(x_act), str(y_act)))
         command = String()
-        command.data = "Data,{},{},{}".format(xMove,zMove,aMove)
-        self.manual_pub.publish(command)
+        command.data = "Data,{},{},{},{}".format(xMove,zMove,0,aMove)
+        self.publisher_robot_command.publish(command)
         self.get_logger().info("Published on robot_command: " + command.data)
 
 def main(args=None):

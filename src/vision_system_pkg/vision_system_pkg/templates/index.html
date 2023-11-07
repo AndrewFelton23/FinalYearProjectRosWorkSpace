@@ -86,7 +86,8 @@
                         <h3>Robot Control</h3>
                         <div class="robot-control">
                             <button id="RHome" class="robot-button">Return To Home</button>
-                            <button id="CalibratePos" class="robot-button">Calibrate Position</button>
+                            <button id="StopCon" class="robot-button">Stop Conveyor</button>
+                            <button id="StartCon" class="robot-button">Start Conveyor</button>
                         </div>
                         <div class="robot-control">
                             <h3>Steps to move</h3>
@@ -185,7 +186,8 @@
             const CGripper = document.getElementById('CGripper');
 
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
 
             // Function to update the LED color
@@ -216,8 +218,9 @@
                     CGripper.setAttribute('disabled',true);
 
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
-                    
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
+
                 } else {
                     //If the program has not started
                     onBtn.removeAttribute('disabled')
@@ -293,7 +296,8 @@
             const CGripper = document.getElementById('CGripper');
 
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,manualMode) {
@@ -324,11 +328,12 @@
                     CGripper.removeAttribute('disabled');
 
                     RHome.removeAttribute('disabled');
-                    CalibratePos.removeAttribute('disabled');
+                    StopCon.removeAttribute('disabled');
+                    StartCon.removeAttribute('disabled');
                 } else {
                     //If the program has not started
-                    autoonBtn.setAttribute('disabled',true);
-                    autooffBtn.setAttribute('disabled',true);
+                    autoonBtn.removeAttribute('disabled');
+                    autooffBtn.removeAttribute('disabled');
 
                     Xp.setAttribute('disabled',true);
                     Xm.setAttribute('disabled',true);
@@ -343,7 +348,8 @@
                     CGripper.setAttribute('disabled',true);
 
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -410,7 +416,8 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
             // Function to update the LED color and button state
             function updateLEDColor(startColor, stopColor, started) {
@@ -443,7 +450,8 @@
                     CGripper.setAttribute('disabled',true);
 
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -512,7 +520,8 @@
     
         // Attach click event handlers to the buttons
         document.getElementById('RHome').addEventListener('click', () => sendCommand('H'));
-        document.getElementById('CalibratePos').addEventListener('click', () => sendCommand('CP'));
+        document.getElementById('StartCon').addEventListener('click', () => sendCommand('F'));
+        document.getElementById('StopCon').addEventListener('click', () => sendCommand('S'));
         document.getElementById('OGripper').addEventListener('click', () => sendCommand('OG'));
         document.getElementById('CGripper').addEventListener('click', () => sendCommand('CG'));
         document.getElementById('X+').addEventListener('click', function() {
