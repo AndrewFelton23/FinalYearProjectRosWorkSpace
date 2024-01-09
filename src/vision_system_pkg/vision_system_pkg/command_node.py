@@ -16,14 +16,16 @@ class CommandNode(Node):
         self.cli = self.create_client(ConveyorCommands, 'conveyor_commands')       
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
-        self.cli_robot = self.create_client(ConveyorCommands, 'conveyor_commands')       
+        self.cli_robot = self.create_client(RobotCommands, 'robot_commands')       
         while not self.cli_robot.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
         self.req = ConveyorCommands.Request()
         self.reqRobot = RobotCommands.Request()                     
-        self.subscriber_ = self.create_subscription(String,
-            'hmi_button_command',self.start_command_callback,10)         
-        self.subscriber_ = self.create_subscription(String,
+        self.subscriber_1 = self.create_subscription(String,
+            'hmi_button_command',self.start_command_callback,10)     
+        self.subscriber_2 = self.create_subscription(String,
+            'found_part',self.start_command_callback,10)            
+        self.subscriber_3 = self.create_subscription(String,
             'robot_command',self.robot_command_callback,10)         
 
     def send_command(self,com):
@@ -36,8 +38,8 @@ class CommandNode(Node):
     def send_robot_command(self,com):
         '''Command client function to send a command'''
         self.get_logger().info('Command ' + str(com.data) + ' recieved')
-        self.req.command = com.data
-        self.future = self.cli.call_async(self.req)
+        self.reqRobot.command = com.data
+        self.future = self.cli_robot.call_async(self.reqRobot)
         self.future.add_done_callback(partial(self.callback_completed))
 
     def callback_completed(self,future):
@@ -52,11 +54,16 @@ class CommandNode(Node):
         '''start_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command))
         self.send_command(command)
+    
+    def found_command_callback(self,command):
+        '''start_button_command Subscriber callback function'''
+        self.get_logger().info("instruction recieved: " + str(command))
+        self.send_command(command)
 
     def robot_command_callback(self,command):
         '''start_button_command Subscriber callback function'''
         self.get_logger().info("instruction recieved: " + str(command.data))
-
+        self.send_robot_command(command)  
         # send service message
         # self.send_command(command)
 

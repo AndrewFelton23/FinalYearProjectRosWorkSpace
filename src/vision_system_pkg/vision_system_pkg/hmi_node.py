@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg._string import String
+from tutorial_interfaces.msg import Joints
 import cv2
 from cv_bridge import CvBridge
 from flask import Flask, Response, render_template, request, jsonify
@@ -17,19 +18,30 @@ app = Flask(__name__)
 image_data = None
 image_mutex = threading.Lock()
 
+joint1 = 0 
+joint2 = 0
+joint3 = 0
+joint4 = 0
+gripper = ""
+
 class HMINode(Node):
     def __init__(self):
         super().__init__('hmi_node')
         self.bridge_ = CvBridge()
         #create subscriber
         self.subscriber_ = self.create_subscription(Image,
-            '/image/vision',self.image_callback,10)
+            "/image",self.image_callback,10)
+        self.subscriber_pos = self.create_subscription(Joints,
+            "/position_update",self.pos_callback,10)
         #create conveyor start publisher
         self.start_pub = self.create_publisher(String,
             'hmi_button_command', 10)
         #create manual mode publisher
         self.manual_pub = self.create_publisher(String,
             'robot_command', 10)
+        # create auto mode publisher
+        self.auto_pub = self.create_publisher(String,
+            'auto_command', 10)
         self.timer_period = 1  # Check every 1 second
         self.timer = self.create_timer(self.timer_period, self.publish_commands_sequence)
         self.start_sequence = None  
@@ -72,15 +84,15 @@ class HMINode(Node):
             else:
                 self.manual_command = None
                 self.manual_mode = None
-        # if self.auto_mode is not None:  
-        #     msg = String()
-        #     if self.auto_mode == True:
-        #         msg.data = 'True' 
-        #     else:
-        #         msg.data = 'False'
-        #     self.auto_pub.publish(msg)
-        #     self.get_logger().info("Published on auto_pub: " + msg.data)
-        #     self.auto_mode = None
+        if self.auto_mode is not None:  
+            msg = String()
+            if self.auto_mode == True:
+                msg.data = 'True' 
+            else:
+                msg.data = 'False'
+            self.auto_pub.publish(msg)
+            self.get_logger().info("Published on auto_pub: " + msg.data)
+            self.auto_mode = None
 
     def start_image_timer(self):
         self.image_timer = threading.Timer(1.0, self.update_image_data)  # Update image every 1 seconds
@@ -92,6 +104,24 @@ class HMINode(Node):
             with image_mutex:
                 self.latest_image = image_data
             time.sleep(5.0)  # Wait for the next update
+
+    def pos_callback(self, joints):
+        self.get_logger().info("recieved the coordinates {}".format(joints))
+        global joint1
+        with joint1:
+            joint1 = joints.joint1
+        global joint2
+        with joint2:
+            joint2 = joints.joint2
+        global joint3
+        with joint3:
+            joint3 = joints.joint3
+        global joint4
+        with joint4:
+            joint4 = joints.joint4
+        self.get_logger().info("Updated the joint angles successfully")        
+
+
 
 @app.route('/')
 def index():
@@ -144,11 +174,10 @@ def send_command():
 
 @app.route('/get_coordinates')
 def get_coordinates():
-    return jsonify({'joint1': 'Joint 1 position',
-                    'joint2': 'Joint 2 position',
-                    'joint3': 'Joint 3 position',
-                    'joint4': 'Joint 4 position',
-                    'gripper': 'Gripper Open or Closed'
+    return jsonify({'joint1': joint1,
+                    'joint2': joint2,
+                    'joint3': joint3,
+                    'joint4': joint4
                     })
 
 

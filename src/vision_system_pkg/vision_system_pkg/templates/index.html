@@ -42,11 +42,6 @@
                         <h3>Joint 4: </h3>
                         <div id="joint4-response"></div>
                     </div>
-                    <div class="position-coordinate">
-                        <h3>Gripper: </h3>
-                        <div id="gripper-response"></div>
-                    </div>
-
                 </div>
             </div>
             <div class="middle-container">
@@ -86,10 +81,12 @@
                         <h3>Robot Control</h3>
                         <div class="robot-control">
                             <button id="RHome" class="robot-button">Return To Home</button>
-                            <button id="SPos" class="robot-button">Save Drop off Position</button>  
+                            <button id="StopCon" class="robot-button">Stop Conveyor</button>
+                            <button id="StartCon" class="robot-button">Start Conveyor</button>
                         </div>
                         <div class="robot-control">
-                            <button id="CalibratePos" class="robot-button">Calibrate Position</button>  
+                            <h3>Steps to move</h3>
+                            <input type="number" id="integerInput" name="integerInput" min="0" step="1">
                         </div>
                         <h3>Gripper Control</h3>
                         <div class="robot-control">
@@ -140,7 +137,6 @@
                     document.getElementById('joint2-response').textContent = data.joint2;
                     document.getElementById('joint3-response').textContent = data.joint3;
                     document.getElementById('joint4-response').textContent = data.joint4;
-                    document.getElementById('gripper-response').textContent = data.gripper;
 
                     // Call the function again after a certain time interval (e.g., 5 seconds)
                     setTimeout(updateHTMLContent, 5000); // 5000 milliseconds = 5 seconds
@@ -151,7 +147,6 @@
                     document.getElementById('joint2-response').textContent = "error recieving information";
                     document.getElementById('joint3-response').textContent = "error recieving information";
                     document.getElementById('joint4-response').textContent = "error recieving information";
-                    document.getElementById('gripper-response').textContent = "error recieving information";
                 });
         }
         // Call the function to start the periodic updates
@@ -183,9 +178,9 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
 
-            const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
 
             // Function to update the LED color
@@ -215,10 +210,10 @@
                     OGripper.setAttribute('disabled',true);
                     CGripper.setAttribute('disabled',true);
 
-                    SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
-                    
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
+
                 } else {
                     //If the program has not started
                     onBtn.removeAttribute('disabled')
@@ -293,9 +288,9 @@
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
 
-            const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
             // Function to update the LED color
             function updateLEDColor(onColor,offColor,manualMode) {
@@ -325,13 +320,13 @@
                     OGripper.removeAttribute('disabled');
                     CGripper.removeAttribute('disabled');
 
-                    SPos.removeAttribute('disabled');
                     RHome.removeAttribute('disabled');
-                    CalibratePos.removeAttribute('disabled');
+                    StopCon.removeAttribute('disabled');
+                    StartCon.removeAttribute('disabled');
                 } else {
                     //If the program has not started
-                    autoonBtn.removeAttribute('disabled',true);
-                    autooffBtn.removeAttribute('disabled',true);
+                    autoonBtn.removeAttribute('disabled');
+                    autooffBtn.removeAttribute('disabled');
 
                     Xp.setAttribute('disabled',true);
                     Xm.setAttribute('disabled',true);
@@ -345,9 +340,9 @@
                     OGripper.setAttribute('disabled',true);
                     CGripper.setAttribute('disabled',true);
 
-                    SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
@@ -397,63 +392,43 @@
         document.addEventListener('DOMContentLoaded', function() {
             const StartledElement = document.getElementById('start-led');
             const StopledElement = document.getElementById('stop-led');
-
             const startBtn = document.getElementById('startBtn');
             const stopBtn = document.getElementById('stopBtn');
 
-            const manualonBtn = document.getElementById('manual-onBtn');
-            const manualoffBtn = document.getElementById('manual-offBtn');
-
-            const manualonledElement = document.getElementById('manual-on-led');
-            const manualoffledElement = document.getElementById('manual-off-led');
 
             const autoonBtn = document.getElementById('auto-onBtn');
             const autooffBtn = document.getElementById('auto-offBtn');
-
-            const autoonledElement = document.getElementById('auto-on-led');
-            const autooffledElement = document.getElementById('auto-off-led');
-
+            const onBtn = document.getElementById('manual-onBtn');
+            const offBtn = document.getElementById('manual-offBtn');
             const Xp = document.getElementById('X+');
             const Xm = document.getElementById('X-');
-
             const Yp = document.getElementById('Y+');
             const Ym = document.getElementById('Y-');
-
             const Zp = document.getElementById('Z+');
             const Zm = document.getElementById('Z-');
-
             const OGripper = document.getElementById('OGripper');
             const CGripper = document.getElementById('CGripper');
-
-            const SPos = document.getElementById('SPos');
             const RHome = document.getElementById('RHome');
-            const CalibratePos = document.getElementById('CalibratePos');
+            const StopCon = document.getElementById('StopCon');
+            const StartCon = document.getElementById('StartCon');
 
-
-            // Function to update the LED color
-            function updateLEDColor(startColor,stopColor,started) {
+            // Function to update the LED color and button state
+            function updateLEDColor(startColor, stopColor, started) {
                 StartledElement.style.backgroundColor = startColor;
                 StartledElement.style.boxShadow = startColor;
-
                 StopledElement.style.backgroundColor = stopColor;
                 StopledElement.style.boxShadow = stopColor;
 
                 if (started) {
-                    //If the program has started
-                    manualonBtn.removeAttribute('disabled');
-                    manualoffBtn.removeAttribute('disabled');
                     autoonBtn.removeAttribute('disabled');
                     autooffBtn.removeAttribute('disabled');
+                    onBtn.removeAttribute('disabled');
+                    offBtn.removeAttribute('disabled');
                 } else {
-                    //If the program has not started
-                    manualonBtn.setAttribute('disabled',true)
-                    manualoffBtn.setAttribute('disabled',true)
-                    manualonledElement.style.backgroundColor = '#e4e4e4';
-                    manualoffledElement.style.backgroundColor = '#DE7373'
                     autoonBtn.setAttribute('disabled',true);
                     autooffBtn.setAttribute('disabled',true);
-                    autoonledElement.style.backgroundColor = '#e4e4e4';
-                    autooffledElement.style.backgroundColor = '#DE7373';
+                    onBtn.setAttribute('disabled',true);
+                    offBtn.setAttribute('disabled',true);
 
                     Xp.setAttribute('disabled',true);
                     Xm.setAttribute('disabled',true);
@@ -467,65 +442,56 @@
                     OGripper.setAttribute('disabled',true);
                     CGripper.setAttribute('disabled',true);
 
-                    SPos.setAttribute('disabled',true);
                     RHome.setAttribute('disabled',true);
-                    CalibratePos.setAttribute('disabled',true);
+                    StopCon.setAttribute('disabled',true);
+                    StartCon.setAttribute('disabled',true);
                 }
 
                 // Send the color information to the Flask app using AJAX (fetch API)
                 fetch('/start_conveyor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    start: started })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        start: started
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
-                // Handle the response from the Flask app if needed
-                console.log(data);
+                    // Handle the response from the Flask app if needed
+                    console.log(data);
                 })
                 .catch(error => {
-                // Handle errors if any
-                console.error('Error:', error);
-                StartledElement.style.backgroundColor ='#e4e4e4';
-                StartledElement.style.boxShadow = '#e4e4e4';
-                StopledElement.style.backgroundColor = '#DE7373';
-                StopledElement.style.boxShadow = '#DE7373';
-
-                startBtn.setAttribute('disabled',true)
-                stopBtn.setAttribute('disabled',true)
-
-                onBtn.setAttribute('disabled',true)
-                offBtn.setAttribute('disabled',true)
-                onledElement.style.backgroundColor = '#e4e4e4';
-                offledElement.style.backgroundColor = '#DE7373';
+                    // Handle errors if any
+                    console.error('Error:', error);
+                    StartledElement.style.backgroundColor = '#e4e4e4';
+                    StartledElement.style.boxShadow = '#e4e4e4';
+                    StopledElement.style.backgroundColor = '#DE7373';
+                    StopledElement.style.boxShadow = '#DE7373';
+                    // You can remove the following lines related to button disabling
                 });
             }
-
             // Click event handler for the start button
             startBtn.addEventListener('click', function() {
                 const startColor = '#49B265';
                 const stopColor = '#e4e4e4';
-                const flag = true
-                updateLEDColor(startColor,stopColor,flag);
+                const flag = true;
+                updateLEDColor(startColor, stopColor, flag);
             });
-
             // Click event handler for the stop button
             stopBtn.addEventListener('click', function() {
                 const stopColor = '#DE7373';
                 const startColor = '#e4e4e4';
-                const flag = false
-                updateLEDColor(startColor,stopColor,flag);
+                const flag = false;
+                updateLEDColor(startColor, stopColor, flag);
             });
-
             // Initialize the LED color (default to grey on page load)
             const startinitialColor = '#e4e4e4';
             const stopinitialColor = '#DE7373';
-            const flag = false
-            updateLEDColor(startinitialColor,stopinitialColor,flag);
-            });
+            const flag = false;
+            updateLEDColor(startinitialColor, stopinitialColor, flag);
+        });
     </script>
     <script>
         function sendCommand(command) {
@@ -546,17 +512,47 @@
         }
     
         // Attach click event handlers to the buttons
-        document.getElementById('RHome').addEventListener('click', () => sendCommand('Return To Home'));
-        document.getElementById('SPos').addEventListener('click', () => sendCommand('Save Drop off Position'));
-        document.getElementById('CalibratePos').addEventListener('click', () => sendCommand('Calibrate Position'));
-        document.getElementById('OGripper').addEventListener('click', () => sendCommand('Open Gripper'));
-        document.getElementById('CGripper').addEventListener('click', () => sendCommand('Close Gripper'));
-        document.getElementById('X+').addEventListener('click', () => sendCommand('X+'));
-        document.getElementById('X-').addEventListener('click', () => sendCommand('X-'));
-        document.getElementById('Y+').addEventListener('click', () => sendCommand('Y+'));
-        document.getElementById('Y-').addEventListener('click', () => sendCommand('Y-'));
-        document.getElementById('Z+').addEventListener('click', () => sendCommand('Z+'));
-        document.getElementById('Z-').addEventListener('click', () => sendCommand('Z-'));
+        document.getElementById('RHome').addEventListener('click', () => sendCommand('H'));
+        document.getElementById('StartCon').addEventListener('click', () => sendCommand('F'));
+        document.getElementById('StopCon').addEventListener('click', () => sendCommand('S'));
+        document.getElementById('OGripper').addEventListener('click', () => sendCommand('OG'));
+        document.getElementById('CGripper').addEventListener('click', () => sendCommand('CG'));
+        document.getElementById('X+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'x+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('X-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'x-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Y+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'y+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Y-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'y-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Z+').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'z+' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
+        document.getElementById('Z-').addEventListener('click', function() {
+            const inputElement = document.getElementById('integerInput');
+            const inputValue = parseInt(inputElement.value) || 0; // Get the current value or default to 0
+            const command = 'z-' + inputValue; // Create the command by concatenating 'x+' and the input value
+            sendCommand(command); // Send the command to the server
+        });
         // Add click event handlers for other buttons as needed
     </script>    
 </body>
